@@ -91,6 +91,6 @@ def home():
     return render_template("index.html", smart_tips=smart_tips, suspicious_tips=suspicious_tips, selected_date=date_filter.isoformat())
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=10000)
 
 
