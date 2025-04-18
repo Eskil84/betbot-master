@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <title>Fogadási Tippek</title>
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px; }
+    h1, h2 { text-align: center; color: #333; }
+    table { width: 90%; margin: 20px auto; border-collapse: collapse; background-color: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    th, td { padding: 10px; border: 1px solid #ccc; text-align: center; }
+    th { background-color: #007bff; color: white; }
+    tr:nth-child(even) { background-color: #f1f1f1; }
+    .section { margin-bottom: 50px; }
+    form { text-align: center; margin: 20px auto; }
+    input[type="date"] { padding: 8px; font-size: 1rem; }
+    button { padding: 8px 16px; font-size: 1rem; }
+  </style>
+</head>
+<body>
+
+  <h1>🎯 Okos Fogadási Tippek</h1>
+
+  <form method="get" action="/" style="text-align:center; margin-bottom: 20px;">
+    <label for="date">Válassz dátumot:</label>
+    <input type="date" id="date" name="date" value="{{ selected_date }}">
+    <button type="submit">Frissítés</button>
+  </form>
+  
+  <div style="text-align:center; margin-top: 10px;">
+    <button type="button" onclick="setDateToday()">Ma</button>
+    <button type="button" onclick="setDateTomorrow()">Holnap</button>
+  </div>
+  
+  <script>
+    function setDateToToday() {
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("date").value = today;
+        document.forms[0].submit();
+    }
+
+    function setDateToTomorrow() {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const dateStr = tomorrow.toISOString().split("T")[0];
+        document.getElementById("date").value = dateStr;
+        document.forms[0].submit();
+    }
+</script>
+
+  <div class="section">
+    <h2>✅ Ésszerű Tippek</h2>
+    {% if smart_tips %}
+    <table>
+      <tr>
+        <th>Mérkőzés</th>
+        <th>Sport</th>
+        <th>Időpont</th>
+        <th>Tipp</th>
+        <th>Odds</th>
+        <th>Superbet</th>
+      </tr>
+      {% for tip in smart_tips %}
+      <tr>
+        <td>{{ tip.match }}</td>
+        <td>{{ tip.sport }}</td>
+        <td>{{ tip.time }}</td>
+        <td>{{ tip.prediction }}</td>
+        <td>{{ tip.avg_odds }}</td>
+        <td><a href="{{ tip.link }}" target="_blank">🔗</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    </p>Nincs ésszerű tipp erre a napra.</p>
+  {% endif %}
+  </div>
+
+  <div class="section">
+    <h2>⚠️ Bunda-gyanús Tippek</h2>
+    {% if suspicious_tips %}
+    <table>
+      <tr>
+        <th>Mérkőzés</th>
+        <th>Sport</th>
+        <th>Időpont</th>
+        <th>Tipp</th>
+        <th>Odds</th>
+        <th>Superbet</th>
+      </tr>
+      {% for tip in suspicious_tips %}
+      <tr>
+        <td>{{ tip.match }}</td>
+        <td>{{ tip.sport }}</td>
+        <td>{{ tip.time }}</td>
+        <td>{{ tip.prediction }}</td>
+        <td>{{ tip.avg_odds }}</td>
+        <td><a href="{{ tip.link }}" target="_blank">🔗</a></td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p>Nincs bunda-gyanús tipp erre a napra.</p>
+    {% endif %}
+  </div>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/static/service-worker.js')
+        .then(reg => console.log('Szolgáltatás regisztrálva:', reg))
+        .catch(err => console.log('Hiba a regisztrációkor:', err));
+    }
+  </script>
+  
+  
