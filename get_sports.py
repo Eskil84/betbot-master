@@ -1,6 +1,6 @@
 import requests
 
-API_KEY = "014bdde1db02eab9fce20a83ef03c3e2"
+API_KEY = "cfb1803716ad84725f69b7a7478e76e5"
 
 url = f"https://api.the-odds-api.com/v4/sports/?apiKey={API_KEY}"
 
