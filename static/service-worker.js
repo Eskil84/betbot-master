@@ -2,8 +2,7 @@ const CACHE_NAME = "betbot-cache-v1";
 const urlsToCache = [
   "/",
   "/static/manifest.json",
-  "/static/icon-192.png",
-  "/static/icon-512.png"
+  "/static/app-icon.png"
 ];
 
 // Telepítéskor cache-elünk mindent
