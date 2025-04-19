@@ -2,140 +2,125 @@
 <html lang="hu">
 <head>
   <meta charset="UTF-8">
-  <title>Fogadási Tippek</title>
+  <title>Okos Fogadási Tippek</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
   <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}" type="image/png">
-  <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='icon-512.png') }}">
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f5f7fa;
-      margin: 0;
-      padding: 0 1rem;
-      color: #333;
-    }
-    header {
-      text-align: center;
-      padding: 1.5rem 0 0.5rem;
+      background-color: #f8f9fa;
+      padding: 20px;
     }
     h1 {
-      font-size: 1.8rem;
-      color: #007bff;
+      text-align: center;
     }
-    h2 {
-      margin-top: 2rem;
-      font-size: 1.4rem;
+    form {
+      text-align: center;
+      margin-bottom: 20px;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 0.5rem;
-      background: white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      border-radius: 8px;
-      overflow: hidden;
+      margin-bottom: 40px;
     }
     th, td {
-      padding: 0.75rem;
-      text-align: left;
-      border-bottom: 1px solid #eee;
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
     }
     th {
-      background: #007bff;
+      background-color: #007bff;
       color: white;
     }
-    tr:last-child td {
-      border-bottom: none;
+    tr:nth-child(even) {
+      background-color: #f1f1f1;
     }
-    a {
-      color: #007bff;
-      text-decoration: none;
+    .section {
+      margin-bottom: 50px;
     }
-    a:hover {
-      text-decoration: underline;
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
     }
-    .date-selector {
-      text-align: center;
-      margin: 1rem 0;
-    }
-    .footer {
-      text-align: center;
-      font-size: 0.85rem;
-      margin: 3rem 0 1rem;
-      color: #888;
+    .icon {
+      width: 20px;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>🎯 Fogadási Tippek – BetBot Master</h1>
-  </header>
+  <h1>🎯 Okos Fogadási Tippek</h1>
 
-  <div class="date-selector">
-    <form method="get" action="/">
-      <label for="date">Dátum:</label>
-      <input type="date" id="date" name="date" value="{{ selected_date }}">
-      <button type="submit">Mutasd</button>
-    </form>
+  <form method="get">
+    <label for="date">Válassz dátumot:</label>
+    <input type="date" id="date" name="date" value="{{ selected_date }}">
+    <button type="submit">Frissítés</button>
+    <button type="button" onclick="location.href='/?date={{ today }}'">Ma</button>
+    <button type="button" onclick="location.href='/?date={{ tomorrow }}'">Holnap</button>
+  </form>
+
+  <div class="section">
+    <h2>🟢 Ésszerű Tippek</h2>
+    <table>
+      <tr>
+        <th>Mérkőzés</th>
+        <th>Sport</th>
+        <th>Időpont</th>
+        <th>Tipp</th>
+        <th>Odds</th>
+        <th>Superbet</th>
+      </tr>
+      {% for tip in smart_tips %}
+        <tr>
+          <td>{{ tip.match }}</td>
+          <td>{{ tip.sport }}</td>
+          <td>{{ tip.time }}</td>
+          <td>{{ tip.prediction }}</td>
+          <td>{{ tip.avg_odds }}</td>
+          <td><a href="{{ tip.link }}" target="_blank">🔍</a></td>
+        </tr>
+      {% endfor %}
+    </table>
   </div>
 
-  <h2>✅ Ésszerű tippek</h2>
-  {% if smart_tips %}
-  <table>
-    <tr>
-      <th>Meccs</th>
-      <th>Időpont</th>
-      <th>Tipp</th>
-      <th>Odds</th>
-      <th>Link</th>
-    </tr>
-    {% for tip in smart_tips %}
-    <tr>
-      <td>{{ tip.match }}</td>
-      <td>{{ tip.time }}</td>
-      <td>{{ tip.prediction }}</td>
-      <td>{{ tip.avg_odds }}</td>
-      <td><a href="{{ tip.link }}" target="_blank">Fogadás</a></td>
-    </tr>
-    {% endfor %}
-  </table>
-  {% else %}
-  <p>Nincs elérhető tipp erre a napra.</p>
-  {% endif %}
-
-  <h2>⚠️ Bunda-gyanús tippek</h2>
-  {% if suspicious_tips %}
-  <table>
-    <tr>
-      <th>Meccs</th>
-      <th>Időpont</th>
-      <th>Tipp</th>
-      <th>Odds</th>
-      <th>Link</th>
-    </tr>
-    {% for tip in suspicious_tips %}
-    <tr>
-      <td>{{ tip.match }}</td>
-      <td>{{ tip.time }}</td>
-      <td>{{ tip.prediction }}</td>
-      <td>{{ tip.avg_odds }}</td>
-      <td><a href="{{ tip.link }}" target="_blank">Fogadás</a></td>
-    </tr>
-    {% endfor %}
-  </table>
-  {% else %}
-  <p>Nincs bunda-gyanús tipp.</p>
-  {% endif %}
-
-  <div class="footer">
-    BetBot Master &copy; {{ selected_date[:4] }} – Mesterséges TippAsszisztens 🤖
+  <div class="section">
+    <h2>⚠️ Bunda-gyanús Tippek</h2>
+    {% if suspicious_tips %}
+      <table>
+        <tr>
+          <th>Mérkőzés</th>
+          <th>Sport</th>
+          <th>Időpont</th>
+          <th>Tipp</th>
+          <th>Odds</th>
+          <th>Superbet</th>
+        </tr>
+        {% for tip in suspicious_tips %}
+          <tr>
+            <td>{{ tip.match }}</td>
+            <td>{{ tip.sport }}</td>
+            <td>{{ tip.time }}</td>
+            <td>{{ tip.prediction }}</td>
+            <td>{{ tip.avg_odds }}</td>
+            <td><a href="{{ tip.link }}" target="_blank">🔍</a></td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>Nincs bunda-gyanús tipp erre a napra.</p>
+    {% endif %}
   </div>
 
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
         navigator.serviceWorker.register('{{ url_for("static", filename="service-worker.js") }}')
+          .then(function (registration) {
+            console.log('Service Worker regisztrálva:', registration);
+          }, function (err) {
+            console.log('Service Worker hiba:', err);
+          });
       });
     }
   </script>

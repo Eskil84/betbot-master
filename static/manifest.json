@@ -4,17 +4,19 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#007bff",
+  "theme_color": "#0c0c0c",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "/static/favicon.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "/static/app-icon.png",
+      "type": "image/png",
+      "sizes": "192x192"
     },
     {
-      "src": "/static/favicon.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/static/app-icon.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ]
 }
+

@@ -8,5 +8,5 @@ self.addEventListener('activate', function (event) {
 });
 
 self.addEventListener('fetch', function (event) {
-  // Jövőbeli offline kezeléshez
+  // Későbbi offline kezeléshez ide írhatunk cache-logikát
 });
