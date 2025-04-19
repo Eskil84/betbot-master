@@ -1,24 +1,12 @@
-const CACHE_NAME = "betbot-cache-v1";
-const urlsToCache = [
-  "/",
-  "/static/manifest.json",
-  "/static/app-icon.png"
-];
-
-// Telepítéskor cache-elünk mindent
-self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(urlsToCache);
-    })
-  );
+self.addEventListener('install', function (event) {
+  console.log('[Service Worker] Telepítve');
+  self.skipWaiting();
 });
 
-// Lekérésnél először a cache-t nézzük
-self.addEventListener("fetch", event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
-    })
-  );
+self.addEventListener('activate', function (event) {
+  console.log('[Service Worker] Aktiválva');
+});
+
+self.addEventListener('fetch', function (event) {
+  // Jövőbeli offline kezeléshez
 });

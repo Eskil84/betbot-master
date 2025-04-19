@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request
 import requests
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from collections import Counter
+import os
 
 app = Flask(__name__)
 
-API_KEY = "cfb1803716ad84725f69b7a7478e76e5"
+API_KEY = "cfb1803716ad84725f69b7a7478e76e5"  # Cseréld ki a saját kulcsodra, ha kell
 
 SPORTS = [
     "soccer_uefa_europa_league",
@@ -24,6 +25,7 @@ def home():
         date_filter = datetime.now(timezone.utc).date()
 
     tips = []
+
     for sport in SPORTS:
         url = f"https://api.the-odds-api.com/v4/sports/{sport}/odds/?regions=eu&markets=h2h&apiKey={API_KEY}&dateFormat=iso"
         response = requests.get(url)
@@ -51,24 +53,25 @@ def home():
                 away = event.get("away_team")
                 match = f"{home} vs {away}"
 
-                outcomes = []
+                # Tippgyűjtés
+                all_outcomes = []
+                odds_by_tip = {}
+
                 for bookmaker in event.get("bookmakers", []):
                     for market in bookmaker.get("markets", []):
+                        if market["key"] != "h2h":
+                            continue
                         for outcome in market.get("outcomes", []):
-                            outcomes.append(outcome["name"])
+                            tip = outcome["name"]
+                            price = outcome["price"]
+                            all_outcomes.append(tip)
+                            odds_by_tip.setdefault(tip, []).append(price)
 
-                if not outcomes:
+                if not all_outcomes:
                     continue
 
-                most_common_tip = Counter(outcomes).most_common(1)[0][0]
-                avg_odds_list = []
-
-                for bookmaker in event.get("bookmakers", []):
-                    for market in bookmaker.get("markets", []):
-                        for outcome in market.get("outcomes", []):
-                            if outcome["name"] == most_common_tip:
-                                avg_odds_list.append(outcome["price"])
-
+                most_common_tip = Counter(all_outcomes).most_common(1)[0][0]
+                avg_odds_list = odds_by_tip.get(most_common_tip, [])
                 avg_odds = round(sum(avg_odds_list) / len(avg_odds_list), 2) if avg_odds_list else None
 
                 link = f"https://www.superbet.ro/pariuri-sportive/cauta/{match.lower().replace(' ', '%20')}"
@@ -81,18 +84,27 @@ def home():
                     "avg_odds": avg_odds,
                     "link": link
                 })
+
             except Exception as err:
                 print("Meccs feldolgozási hiba:", err)
                 continue
 
-    smart_tips = sorted(tips, key=lambda x: x["avg_odds"] or 0, reverse=True)[:10]
-    suspicious_tips = [tip for tip in tips if tip["avg_odds"] and tip["avg_odds"] >= 6][:5]
+    # Szétválasztás duplázás nélkül
+    suspicious_tips = [tip for tip in tips if tip["avg_odds"] and tip["avg_odds"] >= 6]
+    suspicious_matches = {tip["match"] for tip in suspicious_tips}
 
-    return render_template("index.html", smart_tips=smart_tips, suspicious_tips=suspicious_tips, selected_date=date_filter.isoformat())
+    smart_tips = [
+        tip for tip in sorted(tips, key=lambda x: x["avg_odds"] or 0, reverse=True)
+        if tip["match"] not in suspicious_matches
+    ][:10]
+
+    return render_template(
+        "index.html",
+        smart_tips=smart_tips,
+        suspicious_tips=suspicious_tips,
+        selected_date=date_filter.isoformat()
+    )
 
 if __name__ == "__main__":
-   import os
-port = int(os.environ.get("PORT", 10000))
-app.run(host='0.0.0.0', port=port)
-
-
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
